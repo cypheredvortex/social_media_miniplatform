@@ -16,7 +16,7 @@
                 {% endfor %}
             </ul>
         {% endif %}
-        <form method="POST">
+        <form method="POST" action="{% url 'user:signup' %}">
             {% csrf_token %}
             <label for="username">Username</label>
             <input type="text" name="username" id="username" required>
@@ -32,7 +32,7 @@
 
             <button type="submit">Sign Up</button>
         </form>
-        <p>Already have an account? <a href="{% url 'user:login' %}">Login</a></p>
+        <p>Already have an account? <a href="{% url 'pages:login' %}">Login</a></p>
     </div>
 </body>
 </html>

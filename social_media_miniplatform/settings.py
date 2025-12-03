@@ -130,7 +130,17 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
-STATIC_URL = 'static/'
+# URL to use when referring to static files located in `STATICFILES_DIRS`.
+# Leading slash ensures the browser requests an absolute path rather than
+# a relative one (important for templates rendered under nested URLs).
+STATIC_URL = '/static/'
+
+# Tell Django where to find project-level static files (the `static/` folder)
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
+
+# Directory where `collectstatic` will collect static files for production.
+# Not used by the dev server, but useful for deployments.
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field

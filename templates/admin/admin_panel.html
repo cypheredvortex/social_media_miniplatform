@@ -1,0 +1,103 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Panel – Social Media</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@3.3.2/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+</head>
+<body class="bg-gray-100 min-h-screen flex flex-col">
+
+    <!-- HEADER -->
+    <header class="bg-gradient-to-r from-purple-600 to-indigo-600 text-white p-4 shadow-md">
+        <div class="container mx-auto flex justify-between items-center">
+            <h1 class="text-2xl font-bold">Social Media Dashboard</h1>
+            <div>
+                <a href="{% url 'user:logout' %}" class="bg-white text-indigo-600 font-semibold px-4 py-2 rounded hover:bg-gray-200 transition">Logout</a>
+            </div>
+        </div>
+    </header>
+
+    <div class="flex flex-1">
+        <!-- SIDEBAR -->
+        <aside class="w-64 bg-white shadow-md p-6 hidden md:block">
+            <nav class="space-y-4">
+                <h2 class="text-gray-700 font-semibold mb-2">Profile</h2>
+                <a href="" class="block text-gray-600 hover:text-indigo-600">View Profile</a>
+                <a href="" class="block text-gray-600 hover:text-indigo-600">Edit Profile</a>
+                <a href="" class="block text-gray-600 hover:text-indigo-600">Followers</a>
+                <a href="" class="block text-gray-600 hover:text-indigo-600">Following</a>
+
+                <h2 class="text-gray-700 font-semibold mt-6 mb-2">Posts & Content</h2>
+                <a href="" class="block text-gray-600 hover:text-indigo-600">Create Post</a>
+                <a href="" class="block text-gray-600 hover:text-indigo-600">View My Posts</a>
+                <a href="" class="block text-gray-600 hover:text-indigo-600">Search Posts</a>
+
+                <h2 class="text-gray-700 font-semibold mt-6 mb-2">Interactions</h2>
+                <a href="" class="block text-gray-600 hover:text-indigo-600">Notifications</a>
+                <a href="" class="block text-gray-600 hover:text-indigo-600">Search Users</a>
+            </nav>
+        </aside>
+
+        <!-- MAIN CONTENT -->
+        <main class="flex-1 p-6">
+            {% if messages %}
+                <ul class="mb-4">
+                    {% for message in messages %}
+                        <li class="p-3 rounded mb-2 
+                            {% if message.tags == 'error' %}bg-red-100 text-red-700{% endif %}
+                            {% if message.tags == 'success' %}bg-green-100 text-green-700{% endif %}">
+                            {{ message }}
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Posts Card -->
+                <div class="bg-white p-6 rounded-lg shadow hover:shadow-lg transition">
+                    <h3 class="text-lg font-semibold mb-2">Posts</h3>
+                    <p class="text-gray-600 mb-4">Create, edit, delete, or view your posts.</p>
+                    <a href="" class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700 transition">Create Post</a>
+                </div>
+
+                <!-- Followers Card -->
+                <div class="bg-white p-6 rounded-lg shadow hover:shadow-lg transition">
+                    <h3 class="text-lg font-semibold mb-2">Followers & Following</h3>
+                    <p class="text-gray-600 mb-4">View and manage your followers and who you follow.</p>
+                    <a href="" class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700 transition">View Followers</a>
+                </div>
+
+                <!-- Notifications Card -->
+                <div class="bg-white p-6 rounded-lg shadow hover:shadow-lg transition">
+                    <h3 class="text-lg font-semibold mb-2">Notifications</h3>
+                    <p class="text-gray-600 mb-4">Check your recent notifications and interactions.</p>
+                    <a href="" class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700 transition">View Notifications</a>
+                </div>
+
+                <!-- Comments Card -->
+                <div class="bg-white p-6 rounded-lg shadow hover:shadow-lg transition">
+                    <h3 class="text-lg font-semibold mb-2">Comments</h3>
+                    <p class="text-gray-600 mb-4">Write, edit, or delete comments on posts.</p>
+                    <a href="" class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700 transition">Write Comment</a>
+                </div>
+
+                <!-- Likes Card -->
+                <div class="bg-white p-6 rounded-lg shadow hover:shadow-lg transition">
+                    <h3 class="text-lg font-semibold mb-2">Likes</h3>
+                    <p class="text-gray-600 mb-4">Like or unlike posts and comments.</p>
+                    <a href="" class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700 transition">Go to Feed</a>
+                </div>
+
+                <!-- Profile Card -->
+                <div class="bg-white p-6 rounded-lg shadow hover:shadow-lg transition">
+                    <h3 class="text-lg font-semibold mb-2">Profile</h3>
+                    <p class="text-gray-600 mb-4">View and edit your profile, account settings, or delete your account.</p>
+                    <a href="" class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700 transition">Edit Profile</a>
+                </div>
+            </div>
+        </main>
+    </div>
+</body>
+</html>

@@ -10,3 +10,9 @@ def login(request):
 
 def signup(request):
     return render(request, 'auth/signup.html')
+
+def admin_panel(request):
+    return render(request, 'admin/admin_panel.html')
+
+def user(request):
+    return render(request, 'regularUser/user.html')

@@ -17,6 +17,7 @@ django.setup()
 # Import models
 # -------------------------------
 from apps.user.models import User
+from django.contrib.auth.hashers import make_password
 from apps.post.models import Post
 from apps.comment.models import Comment
 from apps.like.models import Like
@@ -37,10 +38,12 @@ for model in [Notification, Report, Like, Comment, Post, Follow, Profile, User]:
 # -------------------------------
 users = []
 for i in range(5):
+    # Give each seeded user a known password (password0, password1, ...)
+    # and store it as a proper hash so authentication works.
     user = User.objects.create(
         username=f"user{i}",
         email=f"user{i}@example.com",
-        password_hash="hashed_password",
+        password_hash=make_password(f"password{i}"),
         role="REGULAR",
         status="ACTIVE"
     )

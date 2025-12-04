@@ -12,25 +12,25 @@ def signup(request):
     return render(request, 'auth/signup.html')
 
 def admin_panel(request):
-    return render(request, 'admin/admin_panel.html')
-
-# def admin_comment_list(request):
-#     return render(request, 'admin/admin_comment_list.html')
-
-# def admin_content_list(request):
-#     return render(request, 'admin/admin_content_list.html')   
-
-# def admin_post_list(request):
-#     return render(request, 'admin/admin_post_list.html')
-
-# def admin_profile_list(request):
-#     return render(request, 'admin/admin_profile_list.html')
-
-# def admin_report_list(request):
-#     return render(request, 'admin/admin_report_list.html')
-
-# def admin_user_list(request):
-#     return render(request, 'admin/admin_user_list.html')
+    from apps.user.models import User
+    from apps.post.models import Post
+    from apps.comment.models import Comment
+    from apps.report.models import Report
+    
+    users_count = User.objects.count()
+    posts_count = Post.objects.count()
+    comments_count = Comment.objects.count()
+    reports_count = Report.objects.count()
+    users = User.objects.all().order_by('-created_at')[:10]
+    
+    context = {
+        'users_count': users_count,
+        'posts_count': posts_count,
+        'comments_count': comments_count,
+        'reports_count': reports_count,
+        'users': users,
+    }
+    return render(request, 'admin/admin_panel.html', context)
 
 def user(request):
     return render(request, 'regularUser/user.html')

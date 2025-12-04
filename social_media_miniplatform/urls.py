@@ -22,4 +22,8 @@ urlpatterns = [
     path('', include('apps.pages.urls')),
     path('admin/', admin.site.urls),
     path('user/', include('apps.user.urls')),
+    path('content/', include('apps.content.urls')),
+    path('post/', include('apps.post.urls')),
+    path('comment/', include('apps.comment.urls')),
+    path('like/', include('apps.like.urls')),
 ]

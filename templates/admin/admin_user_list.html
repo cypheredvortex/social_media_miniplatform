@@ -1,0 +1,49 @@
+{% extends "admin/admin_panel.html" %}
+{% load static %}
+
+{% block content %}
+<div class="bg-white p-6 rounded-2xl shadow-md">
+
+    <h2 class="text-2xl font-bold text-gray-800 mb-4">Users</h2>
+
+    <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200">
+            <thead>
+                <tr class="text-gray-600 text-left text-xs uppercase">
+                    <th class="px-6 py-3 font-semibold">Username</th>
+                    <th class="px-6 py-3 font-semibold">Email</th>
+                    <th class="px-6 py-3 font-semibold">Role</th>
+                    <th class="px-6 py-3 font-semibold">Status</th>
+                    <th class="px-6 py-3 font-semibold">Actions</th>
+                </tr>
+            </thead>
+
+            <tbody class="divide-y divide-gray-200">
+                {% for user in users %}
+                <tr>
+                    <td class="px-6 py-4">{{ user.username }}</td>
+                    <td class="px-6 py-4">{{ user.email }}</td>
+                    <td class="px-6 py-4">{{ user.role }}</td>
+                    <td class="px-6 py-4">
+                        {% if user.status == "ACTIVE" %}
+                        <span class="px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm">Active</span>
+                        {% else %}
+                        <span class="px-3 py-1 bg-red-100 text-red-700 rounded-full text-sm">Suspended</span>
+                        {% endif %}
+                    </td>
+                    <td class="px-6 py-4 flex gap-3">
+                        <a href="{% url 'user:admin_user_detail' user.id %}" class="text-indigo-600 hover:underline">View</a>
+                        <a href="{% url 'user:admin_user_suspend' user.id %}" class="text-yellow-600 hover:underline">Suspend</a>
+                        <a href="{% url 'user:admin_user_ban' user.id %}" class="text-red-600 hover:underline">Ban</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="px-6 py-4 text-center text-gray-500">No users found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

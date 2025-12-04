@@ -109,3 +109,65 @@ def logout_view(request):
     request.session.flush()
     messages.success(request, "You have been logged out.")
     return redirect("user:login")
+
+# Admin views for user management
+from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib import messages
+from .models import User
+from apps.enums.models import UserStatus, UserRole
+
+# List all users
+def admin_user_list(request):
+    users = User.objects.all().order_by('-created_at')
+    return render(request, 'admin/admin_user_list.html', {'users': users})
+
+# View user details
+def admin_user_detail(request, user_id):
+    user = get_object_or_404(User, id=user_id)
+    return render(request, 'admin/admin_user_detail.html', {'user': user})
+
+
+# Suspend a user
+def admin_user_suspend(request, user_id):
+    user = get_object_or_404(User, id=user_id)
+    user.status = UserStatus.SUSPENDED
+    user.save()
+    messages.success(request, f'User {user.username} has been suspended.')
+    return redirect('user:admin_user_list')
+
+
+# Ban a user
+def admin_user_ban(request, user_id):
+    user = get_object_or_404(User, id=user_id)
+    user.status = UserStatus.BANNED
+    user.save()
+    messages.success(request, f'User {user.username} has been banned.')
+    return redirect('user:admin_user_list')
+
+
+# Edit user role
+def admin_user_edit_role(request, user_id):
+    user = get_object_or_404(User, id=user_id)
+    if request.method == 'POST':
+        new_role = request.POST.get('role')
+        if new_role in [choice[0] for choice in UserRole.choices]:
+            user.role = new_role
+            user.save()
+            messages.success(request, f'Role of {user.username} updated to {new_role}.')
+            return redirect('user:admin_user_list')
+        else:
+            messages.error(request, 'Invalid role selected.')
+    return render(request, 'admin/user_edit_role.html', {'user': user, 'roles': UserRole.choices})
+
+
+# View user activity (example: last login and status)
+def admin_user_activity(request, user_id):
+    user = get_object_or_404(User, id=user_id)
+    # You can expand this to include posts, comments, reports, etc.
+    activity = {
+        'last_login': user.last_login,
+        'status': user.status,
+        'role': user.role,
+        'created_at': user.created_at,
+    }
+    return render(request, 'admin/user_activity.html', {'user': user, 'activity': activity})

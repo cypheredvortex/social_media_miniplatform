@@ -1,0 +1,28 @@
+{% extends "admin/admin_panel.html" %}
+{% load static %}
+
+{% block content %}
+<div class="bg-white p-6 rounded-2xl shadow-md">
+
+    <h2 class="text-2xl font-bold text-gray-800 mb-4">Profiles</h2>
+
+    <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200">
+            <thead>
+                <tr class="text-gray-600 text-left text-xs uppercase">
+                    <th class="px-6 py-3 font-semibold">Username</th>
+                    <th class="px-6 py-3 font-semibold">Bio</th>
+                    <th class="px-6 py-3 font-semibold">Location</th>
+                    <th class="px-6 py-3 font-semibold">Actions</th>
+                </tr>
+            </thead>
+
+            <tbody class="divide-y divide-gray-200">
+                <tr>
+                    <td colspan="4" class="px-6 py-4 text-center text-gray-500">No profiles found.</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

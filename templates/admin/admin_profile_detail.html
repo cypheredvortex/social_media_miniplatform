@@ -1,0 +1,22 @@
+{% extends "admin/admin_panel.html" %}
+{% load static %}
+
+{% block content %}
+<div class="bg-white p-6 rounded-2xl shadow-md max-w-3xl">
+
+    <h2 class="text-2xl font-bold text-gray-800 mb-4">User Profile</h2>
+
+    <div class="flex gap-6">
+        <img src="{{ profile.avatar_url }}" class="w-28 h-28 rounded-full border">
+        <div>
+            <p><strong>Username:</strong> {{ profile.user.username }}</p>
+            <p><strong>Email:</strong> {{ profile.user.email }}</p>
+            <p><strong>Bio:</strong> {{ profile.bio|default:"No bio" }}</p>
+            <p><strong>Location:</strong> {{ profile.location|default:"N/A" }}</p>
+            <p><strong>Website:</strong> {{ profile.website|default:"N/A" }}</p>
+            <p><strong>Birthdate:</strong> {{ profile.birthdate|default:"N/A" }}</p>
+        </div>
+    </div>
+
+</div>
+{% endblock content %}

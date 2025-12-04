@@ -1,0 +1,44 @@
+{% extends "admin/admin_panel.html" %}
+{% load static %}
+
+{% block content %}
+<div class="bg-white p-6 rounded-2xl shadow-md">
+
+    <h2 class="text-2xl font-bold text-gray-800 mb-4">Posts</h2>
+
+    <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200">
+
+            <thead>
+                <tr class="text-gray-600 text-left text-xs uppercase">
+                    <th class="px-6 py-3">Text</th>
+                    <th class="px-6 py-3">Author</th>
+                    <th class="px-6 py-3">Visibility</th>
+                    <th class="px-6 py-3">Status</th>
+                    <th class="px-6 py-3">Actions</th>
+                </tr>
+            </thead>
+
+            <tbody class="divide-y divide-gray-200">
+                {% for post in posts %}
+                <tr>
+                    <td class="px-6 py-4">{{ post.text|truncatechars:40 }}</td>
+                    <td class="px-6 py-4">{{ post.author.username }}</td>
+                    <td class="px-6 py-4">{{ post.visibility }}</td>
+                    <td class="px-6 py-4">{{ post.status }}</td>
+                    <td class="px-6 py-4 flex gap-3">
+                        <a href="{% url 'admin_post_detail' post.id %}" class="text-indigo-600 hover:underline">View</a>
+                        <a href="{% url 'admin_post_delete' post.id %}" class="text-red-600 hover:underline">Delete</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="px-6 py-4 text-center text-gray-500">No posts found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+
+        </table>
+    </div>
+</div>
+{% endblock %}

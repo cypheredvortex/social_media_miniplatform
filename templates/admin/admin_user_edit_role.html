@@ -1,0 +1,55 @@
+{% extends "admin/admin_panel.html" %}
+{% load static %}
+
+{% block content %}
+<div class="bg-white p-6 rounded-2xl shadow-md max-w-3xl mx-auto">
+
+    <h2 class="text-2xl font-bold text-gray-800 mb-6">Edit Role for {{ user.username }}</h2>
+
+    <!-- Current User Info -->
+    <div class="flex items-center gap-6 mb-6">
+        <img src="{% if user.profile.avatar_url %}{{ user.profile.avatar_url }}{% else %}{% static 'images/avatar.png' %}{% endif %}" 
+             alt="Avatar" class="w-20 h-20 rounded-full border-2 border-indigo-500">
+        <div>
+            <h3 class="text-xl font-semibold text-gray-800">{{ user.username }}</h3>
+            <p class="text-gray-600">{{ user.email }}</p>
+            <p class="text-gray-600">Current Role: <span class="font-medium text-indigo-600">{{ user.role }}</span></p>
+        </div>
+    </div>
+
+    <!-- Display messages -->
+    {% if messages %}
+        <ul class="mb-4">
+            {% for message in messages %}
+                <li class="p-3 rounded mb-2 shadow
+                    {% if message.tags == 'error' %}bg-red-100 text-red-700{% endif %}
+                    {% if message.tags == 'success' %}bg-green-100 text-green-700{% endif %}">
+                    {{ message }}
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+    <!-- Edit Role Form -->
+    <form method="POST" class="space-y-4">
+        {% csrf_token %}
+        <div>
+            <label for="role" class="block text-gray-700 font-medium mb-2">Select New Role</label>
+            <select id="role" name="role" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                {% for value, label in roles %}
+                    <option value="{{ value }}" {% if user.role == value %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="flex gap-4 mt-4">
+            <button type="submit" class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition font-semibold">
+                Update Role
+            </button>
+            <a href="{% url 'user:admin_user_detail' user.id %}" class="bg-gray-300 text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-400 transition font-semibold">
+                Cancel
+            </a>
+        </div>
+    </form>
+</div>
+{% endblock %}

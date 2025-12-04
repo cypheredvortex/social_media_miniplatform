@@ -24,8 +24,8 @@
                     <td class="px-6 py-4">{{ profile.bio|truncatechars:50 }}</td>
                     <td class="px-6 py-4">{{ profile.location|default:"N/A" }}</td>
                     <td class="px-6 py-4 flex gap-3">
-                        <a href="{% url 'profil:admin_profile_detail' profile.id %}" class="text-indigo-600 hover:underline">View</a>
-                        <a href="{% url 'profil:admin_profile_edit' profile.id %}" class="text-blue-600 hover:underline">Edit</a>
+                        <a href="{% url 'profil:admin_profile_edit' profile.id|stringformat:"s" %}" class="text-indigo-600 hover:underline">View</a>
+                        <a href="{% url 'profil:admin_profile_detail' profile.id|stringformat:"s" %}" class="text-blue-600 hover:underline">Edit</a>
                     </td>
                 </tr>
                 {% empty %}

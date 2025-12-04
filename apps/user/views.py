@@ -123,12 +123,20 @@ def admin_user_list(request):
 
 # View user details
 def admin_user_detail(request, user_id):
+    try:
+        user_id = int(user_id)
+    except (ValueError, TypeError):
+        return get_object_or_404(User, id=user_id)
     user = get_object_or_404(User, id=user_id)
     return render(request, 'admin/admin_user_detail.html', {'user': user})
 
 
 # Suspend a user
 def admin_user_suspend(request, user_id):
+    try:
+        user_id = int(user_id)
+    except (ValueError, TypeError):
+        pass
     user = get_object_or_404(User, id=user_id)
     user.status = UserStatus.SUSPENDED
     user.save()
@@ -138,6 +146,10 @@ def admin_user_suspend(request, user_id):
 
 # Ban a user
 def admin_user_ban(request, user_id):
+    try:
+        user_id = int(user_id)
+    except (ValueError, TypeError):
+        pass
     user = get_object_or_404(User, id=user_id)
     user.status = UserStatus.BANNED
     user.save()
@@ -147,6 +159,10 @@ def admin_user_ban(request, user_id):
 
 # Edit user role
 def admin_user_edit_role(request, user_id):
+    try:
+        user_id = int(user_id)
+    except (ValueError, TypeError):
+        pass
     user = get_object_or_404(User, id=user_id)
     if request.method == 'POST':
         new_role = request.POST.get('role')
@@ -157,11 +173,15 @@ def admin_user_edit_role(request, user_id):
             return redirect('user:admin_user_list')
         else:
             messages.error(request, 'Invalid role selected.')
-    return render(request, 'admin/user_edit_role.html', {'user': user, 'roles': UserRole.choices})
+    return render(request, 'admin/admin_user_edit_role.html', {'user': user, 'roles': UserRole.choices})
 
 
 # View user activity (example: last login and status)
 def admin_user_activity(request, user_id):
+    try:
+        user_id = int(user_id)
+    except (ValueError, TypeError):
+        pass
     user = get_object_or_404(User, id=user_id)
     # You can expand this to include posts, comments, reports, etc.
     activity = {

@@ -26,4 +26,7 @@ urlpatterns = [
     path('post/', include('apps.post.urls')),
     path('comment/', include('apps.comment.urls')),
     path('like/', include('apps.like.urls')),
+    path('profile/', include('apps.profil.urls')),
+    path('report/', include('apps.report.urls')),
+    path('notification/', include('apps.notification.urls')),
 ]

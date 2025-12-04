@@ -27,9 +27,9 @@
                     <td class="px-6 py-4">{{ report.reason|truncatechars:60 }}</td>
                     <td class="px-6 py-4">{{ report.status }}</td>
                     <td class="px-6 py-4 flex gap-3">
-                        <a href="{% url 'admin_report_detail' report.id %}" class="text-indigo-600 hover:underline">View</a>
-                        <a href="{% url 'admin_report_resolve' report.id %}" class="text-green-600 hover:underline">Resolve</a>
-                        <a href="{% url 'admin_report_reject' report.id %}" class="text-red-600 hover:underline">Reject</a>
+                        <a href="{% url 'report:admin_report_detail' report.id %}" class="text-indigo-600 hover:underline">View</a>
+                        <a href="{% url 'report:admin_report_resolve' report.id %}" class="text-green-600 hover:underline">Resolve</a>
+                        <a href="{% url 'report:admin_report_reject' report.id %}" class="text-red-600 hover:underline">Reject</a>
                     </td>
                 </tr>
                 {% empty %}

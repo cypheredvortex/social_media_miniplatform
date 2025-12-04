@@ -9,7 +9,7 @@ from apps.enums.models import ContentStatus
 # List all posts
 def admin_post_list(request):
     posts = Post.objects.all().order_by('-created_at')
-    return render(request, 'admin/post_list.html', {'posts': posts})
+    return render(request, 'admin/admin_post_list.html', {'posts': posts})
 
 
 # View post details

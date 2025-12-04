@@ -11,7 +11,7 @@ from django.core.mail import send_mail  # optional, if sending email warnings
 # List all reports
 def admin_report_list(request):
     reports = Report.objects.all().order_by('-created_at')
-    return render(request, 'admin/report_list.html', {'reports': reports})
+    return render(request, 'admin/admin_report_list.html', {'reports': reports})
 
 
 # View report details

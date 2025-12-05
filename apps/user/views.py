@@ -130,6 +130,35 @@ def admin_user_detail(request, user_id):
     user = get_object_or_404(User, id=user_id)
     return render(request, 'admin/admin_user_detail.html', {'user': user})
 
+def _redirect_back(request):
+    """
+    Determines whether to redirect to admin panel or user list
+    depending on where the admin came from.
+    """
+    ref = request.META.get("HTTP_REFERER", "")
+
+    if "admin_panel" in ref:
+        return redirect("pages:admin_panel")
+
+    # Default fallback
+    return redirect("user:admin_user_list")
+
+
+# Reactivate a suspended or banned user
+def admin_user_activate(request, user_id):
+    try:
+        user_id = int(user_id)
+    except (ValueError, TypeError):
+        pass
+
+    user = get_object_or_404(User, id=user_id)
+
+    # Set status back to ACTIVE
+    user.status = UserStatus.ACTIVE
+    user.save()
+
+    messages.success(request, f'User {user.username} has been reactivated.')
+    return _redirect_back(request)
 
 # Suspend a user
 def admin_user_suspend(request, user_id):
@@ -141,7 +170,7 @@ def admin_user_suspend(request, user_id):
     user.status = UserStatus.SUSPENDED
     user.save()
     messages.success(request, f'User {user.username} has been suspended.')
-    return redirect('user:admin_user_list')
+    return _redirect_back(request)
 
 
 # Ban a user
@@ -154,7 +183,7 @@ def admin_user_ban(request, user_id):
     user.status = UserStatus.BANNED
     user.save()
     messages.success(request, f'User {user.username} has been banned.')
-    return redirect('user:admin_user_list')
+    return _redirect_back(request)
 
 
 # Edit user role

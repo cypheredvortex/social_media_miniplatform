@@ -40,6 +40,9 @@
         <a href="{% url 'user:admin_user_edit_role' user.id %}" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition font-semibold">
             Edit User
         </a>
+        <a href="{% url 'user:admin_user_activate' user.id %}" class="bg-green-500 text-green px-4 py-2 rounded-lg hover:bg-green-600 transition font-semibold">
+            Activate
+        </a>
         <a href="{% url 'user:admin_user_suspend' user.id %}" class="bg-yellow-500 text-white px-4 py-2 rounded-lg hover:bg-yellow-600 transition font-semibold">
             Suspend
         </a>

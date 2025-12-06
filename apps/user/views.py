@@ -131,18 +131,11 @@ def admin_user_detail(request, user_id):
     return render(request, 'admin/admin_user_detail.html', {'user': user})
 
 def _redirect_back(request):
-    """
-    Determines whether to redirect to admin panel or user list
-    depending on where the admin came from.
-    """
-    ref = request.META.get("HTTP_REFERER", "")
+    next_url = request.GET.get("next")
+    if next_url:
+        return redirect(next_url)
 
-    if "admin_panel" in ref:
-        return redirect("pages:admin_panel")
-
-    # Default fallback
-    return redirect("user:admin_user_list")
-
+    return redirect("user:admin_user_list")  # fallback
 
 # Reactivate a suspended or banned user
 def admin_user_activate(request, user_id):

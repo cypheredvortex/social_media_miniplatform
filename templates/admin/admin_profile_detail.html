@@ -2,19 +2,37 @@
 {% load static %}
 
 {% block content %}
-<div class="bg-white p-6 rounded-2xl shadow-md max-w-3xl">
+<div class="bg-white p-6 rounded-2xl shadow-md max-w-3xl mx-auto">
 
-    <h2 class="text-2xl font-bold text-gray-800 mb-4">User Profile</h2>
+    <div class="flex justify-between items-center mb-6">
+        <h2 class="text-2xl font-bold text-gray-800">User Profile</h2>
+        <a href="{% url 'profil:admin_profile_edit' profile.id %}"
+           class="text-indigo-600 hover:underline font-semibold">
+            Edit Profile
+        </a>
+    </div>
 
     <div class="flex gap-6">
-        <img src="{{ profile.avatar_url }}" class="w-28 h-28 rounded-full border">
-        <div>
+        <img src="{{ profile.avatar_url|default:'/static/img/default-avatar.png' }}" 
+             class="w-28 h-28 rounded-full border object-cover">
+
+        <div class="space-y-2">
             <p><strong>Username:</strong> {{ profile.user.username }}</p>
             <p><strong>Email:</strong> {{ profile.user.email }}</p>
             <p><strong>Bio:</strong> {{ profile.bio|default:"No bio" }}</p>
             <p><strong>Location:</strong> {{ profile.location|default:"N/A" }}</p>
-            <p><strong>Website:</strong> {{ profile.website|default:"N/A" }}</p>
-            <p><strong>Birthdate:</strong> {{ profile.birthdate|default:"N/A" }}</p>
+            <p><strong>Website:</strong> 
+                {% if profile.website %}
+                    <a href="{{ profile.website }}" target="_blank" class="text-blue-600 hover:underline">
+                        {{ profile.website }}
+                    </a>
+                {% else %}
+                    N/A
+                {% endif %}
+            </p>
+            <p><strong>Birthdate:</strong> 
+                {{ profile.birthdate|date:"Y-m-d"|default:"N/A" }}
+            </p>
         </div>
     </div>
 

@@ -23,8 +23,8 @@
                     <td class="px-6 py-4">{{ content.text|truncatechars:60 }}</td>
                     <td class="px-6 py-4">{{ content.status }}</td>
                     <td class="px-6 py-4 flex gap-3">
-                        <a href="{% url 'content:admin_content_approve' content.id %}" class="text-green-600 hover:underline">Approve</a>
-                        <a href="{% url 'content:admin_content_reject' content.id %}" class="text-red-600 hover:underline">Reject</a>
+                        <a href="{% url 'content:admin_content_approve' content.id|stringformat:"s" %}" class="text-green-600 hover:underline">Approve</a>
+                        <a href="{% url 'content:admin_content_reject' content.id|stringformat:"s" %}" class="text-red-600 hover:underline">Reject</a>
                     </td>
                 </tr>
                 {% empty %}

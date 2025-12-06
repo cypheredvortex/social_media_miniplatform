@@ -2,6 +2,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
 from django.http import Http404
 from .models import Profile
+from bson import ObjectId
 
 
 def admin_profile_list(request):
@@ -13,22 +14,21 @@ def admin_profile_list(request):
 
 # --- View profile details ---
 def admin_profile_detail(request, profile_id):
+    # Validate that profile_id is a valid ObjectId string
     try:
-        profile_id = int(profile_id)
-    except (ValueError, TypeError):
+        obj_id = ObjectId(profile_id)
+    except Exception:
         raise Http404("Invalid profile ID")
 
-    profile = get_object_or_404(Profile.objects.select_related('user'), id=profile_id)
-    return render(request, 'admin/admin_profile_detail.html', {'profile': profile})
+    # Fetch the profile and its related user
+    profile = get_object_or_404(Profile.objects.select_related('user'), id=obj_id)
 
+    # Render the template with a single profile
+    return render(request, 'admin/admin_profile_detail.html', {'profile': profile})
 
 # --- Edit a profile ---
 def admin_profile_edit(request, profile_id):
-    try:
-        profile_id = int(profile_id)
-    except (ValueError, TypeError):
-        raise Http404("Invalid profile ID")
-
+    # DO NOT convert profile_id to int
     profile = get_object_or_404(Profile.objects.select_related('user'), id=profile_id)
 
     if request.method == 'POST':
@@ -47,6 +47,6 @@ def admin_profile_edit(request, profile_id):
         )
 
         messages.success(request, f'Profile of {profile.user.username} updated successfully.')
-        return redirect('profil:admin_profile_detail', profile_id=profile.id)
+        return redirect('profil:admin_profile_detail', profile_id=str(profile.id))
 
     return render(request, 'admin/admin_profile_edit.html', {'profile': profile})

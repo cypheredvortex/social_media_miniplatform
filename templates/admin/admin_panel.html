@@ -145,10 +145,10 @@
                             <td class="px-6 py-4 text-gray-700">{{ user.role }}</td>
                             <td class="px-6 py-4 text-gray-700">{{ user.status }}</td>
                             <td class="px-6 py-4">
-                                <a href="{% url 'user:admin_user_detail' user.id %}" class="text-indigo-600 hover:underline mr-2">View</a>
-                                <a href="{% url 'user:admin_user_suspend' user.id %}?next={{ request.path }}" class="text-yellow-600 hover:underline mr-2">Suspend</a>
-                                <a href="{% url 'user:admin_user_ban' user.id %}?next={{ request.path }}" class="text-red-600 hover:underline">Ban</a>
-                                <a href="{% url 'user:admin_user_activate' user.id %}?next={{ request.path }}" class="text-green-600 hover:underline">Activate</a>
+                                <a href="{% url 'user:admin_user_detail' user.id|stringformat:"s" %}" class="text-indigo-600 hover:underline mr-2">View</a>
+                                <a href="{% url 'user:admin_user_suspend' user.id|stringformat:"s" %}?next={{ request.path }}" class="text-yellow-600 hover:underline mr-2">Suspend</a>
+                                <a href="{% url 'user:admin_user_ban' user.id|stringformat:"s" %}?next={{ request.path }}" class="text-red-600 hover:underline">Ban</a>
+                                <a href="{% url 'user:admin_user_activate' user.id|stringformat:"s" %}?next={{ request.path }}" class="text-green-600 hover:underline">Activate</a>
                             </td>
                         </tr>
                         {% empty %}

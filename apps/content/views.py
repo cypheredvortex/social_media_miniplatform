@@ -47,43 +47,60 @@ def admin_content_delete(request, content_id):
 # Approve reported content
 from bson import ObjectId
 from django.http import Http404
+from apps.enums.models import ContentStatus, ReportStatus, ReportTargetType
+
+from bson import ObjectId
+from django.shortcuts import get_object_or_404, redirect
+from django.contrib import messages
+from apps.content.models import Content
+from apps.report.models import Report
+from apps.enums.models import ContentStatus, ReportStatus, ReportTargetType
 
 def admin_content_approve(request, content_id):
-    try:
-        content = Content.objects.get(id=ObjectId(content_id))
-    except Exception:
-        raise Http404("No Content matches the given query.")
+    # Get the content
+    content = get_object_or_404(Content, id=ObjectId(content_id))
 
-    # Check for pending reports
+    # Find pending reports for this content
     reports = Report.objects.filter(
-        target_type='content', target_user=None, target_content=content, status='pending'
+        target_type=ReportTargetType.POST,   # 'POST' corresponds to content
+        target_content=content,
+        status=ReportStatus.PENDING
     )
+
     if not reports.exists():
         messages.error(request, 'This content has no pending reports and cannot be approved via reports panel.')
         return redirect('content:admin_content_list')
 
+    # Approve the content
     content.status = ContentStatus.ACTIVE
     content.save()
-    reports.update(status='resolved')
+
+    # Mark reports as resolved
+    reports.update(status=ReportStatus.RESOLVED)
     messages.success(request, 'Reported content approved successfully.')
     return redirect('content:admin_content_list')
 
 
 def admin_content_reject(request, content_id):
-    try:
-        content = Content.objects.get(id=ObjectId(content_id))
-    except Exception:
-        raise Http404("No Content matches the given query.")
+    # Get the content
+    content = get_object_or_404(Content, id=ObjectId(content_id))
 
+    # Find pending reports for this content
     reports = Report.objects.filter(
-        target_type='content', target_user=None, target_content=content, status='pending'
+        target_type=ReportTargetType.POST,
+        target_content=content,
+        status=ReportStatus.PENDING
     )
+
     if not reports.exists():
         messages.error(request, 'This content has no pending reports and cannot be rejected via reports panel.')
         return redirect('content:admin_content_list')
 
-    content.status = ContentStatus.REJECTED
+    # Reject the content
+    content.status = ContentStatus.DELETED  # Or FLAGGED depending on your workflow
     content.save()
-    reports.update(status='resolved')
+
+    # Mark reports as resolved
+    reports.update(status=ReportStatus.RESOLVED)
     messages.success(request, 'Reported content rejected successfully.')
     return redirect('content:admin_content_list')

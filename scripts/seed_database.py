@@ -1,139 +1,180 @@
+# scripts/seed_database.py
+
 import os
 import django
-import sys
 import random
-from datetime import datetime
+from datetime import datetime, timedelta
+from bson import ObjectId
+from faker import Faker
+from django.utils import timezone
+import sys
 
-from bson import ObjectId  # Needed for Djongo ObjectId
-
-# -------------------------------
-# Setup Django environment
-# -------------------------------
+# --- Setup Django environment ---
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "social_media_miniplatform.settings")
 django.setup()
 
-# -------------------------------
-# Import models
-# -------------------------------
+# --- Imports ---
 from apps.user.models import User
-from django.contrib.auth.hashers import make_password
+from apps.profil.models import Profile
 from apps.post.models import Post
 from apps.comment.models import Comment
-from apps.like.models import Like
-from apps.follow.models import Follow
+from apps.content.models import Content
 from apps.report.models import Report
-from apps.notification.models import Notification
-from apps.profil.models import Profile
-from apps.enums.models import VisibilityType, ReportTargetType, NotificationType
+from apps.enums.models import VisibilityType, ContentStatus, ReportStatus, ReportTargetType, UserRole, UserStatus
 
-# -------------------------------
-# Clear existing data
-# -------------------------------
-for model in [Notification, Report, Like, Comment, Post, Follow, Profile, User]:
-    model.objects.all().delete()
+fake = Faker()
 
-# -------------------------------
-# Seed Users
-# -------------------------------
+# --- Parameters ---
+NUM_USERS = 10
+NUM_POSTS = 20
+NUM_COMMENTS = 50
+NUM_REPORTS = 20
+
+# --- Step 0: Clear existing data ---
+print("Clearing existing data...")
+Report.objects.all().delete()
+Comment.objects.all().delete()
+Post.objects.all().delete()
+Profile.objects.all().delete()
+User.objects.all().delete()
+Content.objects.all().delete()
+print("Existing data cleared.")
+
+# --- Step 1: Create Users ---
+print("Seeding users...")
 users = []
-for i in range(5):
-    # Give each seeded user a known password (password0, password1, ...)
-    # and store it as a proper hash so authentication works.
+
+for i in range(NUM_USERS):
+    last_login = timezone.make_aware(fake.date_time_this_year())
+    
     user = User.objects.create(
-        username=f"user{i}",
-        email=f"user{i}@example.com",
-        password_hash=make_password(f"password{i}"),
-        role="REGULAR",
-        status="ACTIVE"
+        id=ObjectId(),
+        username=f"user{i+1}",
+        email=f"user{i+1}@example.com",
+        password_hash="hashed_password",
+        role=random.choice([UserRole.REGULAR, UserRole.ADMIN]),
+        status=UserStatus.ACTIVE,  # adapted to your choices
+        last_login=last_login
     )
+    
     users.append(user)
 
-# -------------------------------
-# Seed Profiles
-# -------------------------------
-for user in users:
-    Profile.objects.create(
-        user=user,
-        bio=f"Bio of {user.username}",
-        location=f"City {random.randint(1, 100)}",
-        avatar_url=f"https://picsum.photos/seed/{user.username}/200",
-        birthdate=datetime(1990 + random.randint(0, 10), random.randint(1, 12), random.randint(1, 28)),
-        website=f"https://example.com/{user.username}"
-    )
+print(f"Created {len(users)} users.")
 
-# -------------------------------
-# Seed Posts
-# -------------------------------
+
+# --- Step 2: Create Profiles ---
+fake = Faker()
+
+users = list(User.objects.all())
+profiles = []
+
+for user in users:
+    profile = Profile.objects.create(
+        id=ObjectId(),
+        user=user,
+        bio=fake.paragraph(nb_sentences=2),
+        location=fake.city(),
+        avatar_url=fake.image_url(),
+        birthdate=fake.date_of_birth(minimum_age=18, maximum_age=70),
+        website=fake.url()
+    )
+    profiles.append(profile)
+
+print(f"Created {len(profiles)} profiles.")
+
+
+# --- Step 3: Create Posts + Content ---
+print("Seeding posts and content...")
 posts = []
-for i in range(5):
+post_contents = {}
+for _ in range(NUM_POSTS):
+    author = random.choice(users)
+    text = fake.sentence(nb_words=10)
+    status = random.choice([ContentStatus.ACTIVE, ContentStatus.DELETED, ContentStatus.FLAGGED])
+    
     post = Post.objects.create(
-        author=random.choice(users),
-        text=f"This is post {i}",
-        image_url=f"https://picsum.photos/seed/post{i}/400",
-        visibility=random.choice([v[0] for v in VisibilityType.choices])
+        id=ObjectId(),
+        text=text,
+        author=author,
+        image_url=f"https://picsum.photos/200/300?random={random.randint(1,1000)}",
+        visibility=random.choice([VisibilityType.PUBLIC, VisibilityType.FRIENDS_ONLY, VisibilityType.PRIVATE]),
+        status=status,
+        is_edited=False
     )
     posts.append(post)
 
-# -------------------------------
-# Seed Comments
-# -------------------------------
+    # Content for reports
+    content = Content.objects.create(
+        id=ObjectId(),
+        text=text,
+        status=status
+    )
+    post_contents[post.id] = content
+    print(f"Created Post {post.id} by {author.username} with Content {content.id}")
+
+# --- Step 4: Create Comments + Content ---
+print("Seeding comments and content...")
 comments = []
-for i in range(5):
+comment_contents = {}
+for _ in range(NUM_COMMENTS):
+    author = random.choice(users)
+    post = random.choice(posts)
+    parent_comment = random.choice(comments) if comments and random.random() < 0.3 else None
+    text = fake.sentence(nb_words=8)
+    status = random.choice([ContentStatus.ACTIVE, ContentStatus.DELETED, ContentStatus.FLAGGED])
+    
     comment = Comment.objects.create(
-        author=random.choice(users),
-        post=random.choice(posts),
-        text=f"This is comment {i}"
+        id=ObjectId(),
+        text=text,
+        author=author,
+        post=post,
+        parent_comment=parent_comment,
+        status=status,
+        is_edited=False
     )
     comments.append(comment)
 
-# -------------------------------
-# Seed Likes
-# -------------------------------
-for i in range(5):
-    Like.objects.create(
-        user=random.choice(users),
-        post=random.choice(posts),
-        comment=random.choice(comments)
+    # Content for reports
+    content = Content.objects.create(
+        id=ObjectId(),
+        text=text,
+        status=status
     )
+    comment_contents[comment.id] = content
+    print(f"Created Comment {comment.id} by {author.username} with Content {content.id}")
 
-# -------------------------------
-# Seed Follows
-# -------------------------------
-for i in range(5):
-    Follow.objects.create(
-        follower=users[i],
-        followed=users[(i + 1) % 5]
+# --- Step 5: Create Reports ---
+print("Seeding reports...")
+for _ in range(NUM_REPORTS):
+    reporter = random.choice(users)
+    target_type = random.choice([ReportTargetType.USER, ReportTargetType.POST, ReportTargetType.COMMENT])
+    status = random.choice([ReportStatus.PENDING, ReportStatus.RESOLVED, ReportStatus.REJECTED])
+    reason = fake.sentence(nb_words=5)
+    
+    target_user = None
+    target_content = None
+    
+    if target_type == ReportTargetType.USER:
+        target_user = random.choice([u for u in users if u != reporter])
+    elif target_type == ReportTargetType.POST:
+        post = random.choice(posts)
+        target_user = post.author
+        target_content = post_contents.get(post.id)
+    else:  # COMMENT
+        comment = random.choice(comments)
+        target_user = comment.author
+        target_content = comment_contents.get(comment.id)
+    
+    report = Report.objects.create(
+        id=ObjectId(),
+        reporter=reporter,
+        target_type=target_type,
+        target_user=target_user,
+        target_content=target_content,
+        reason=reason,
+        status=status
     )
+    print(f"Created Report {report.id} for {target_type}")
 
-# -------------------------------
-# Seed Reports (users, posts, comments)
-# -------------------------------
-target_choices = ['USER', 'POST', 'COMMENT']
-for i in range(5):
-    target_type = random.choice(target_choices)
-    report_data = {
-        'reporter': random.choice(users),
-        'target_type': target_type,
-        'reason': f"This is report reason {i}"
-    }
-    if target_type == 'USER':
-        report_data['target_user'] = random.choice(users)
-    elif target_type == 'POST':
-        report_data['target_user'] = None
-    elif target_type == 'COMMENT':
-        report_data['target_user'] = None
-
-    Report.objects.create(**report_data)
-
-# -------------------------------
-# Seed Notifications
-# -------------------------------
-for i in range(5):
-    Notification.objects.create(
-        user=random.choice(users),
-        type=random.choice([n[0] for n in NotificationType.choices]),
-        message=f"This is notification {i}"
-    )
-
-print("✅ Database seeded successfully!")
+print("Seeding completed successfully!")

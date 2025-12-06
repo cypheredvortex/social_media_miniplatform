@@ -5,7 +5,7 @@ from djongo import models
 from apps.user.models import User
 
 class Profile(models.Model):
-    id = models.IntegerField(primary_key=True)
+    id = models.ObjectIdField(primary_key=True)  # <-- Change from IntegerField
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     bio = models.TextField(blank=True)
     location = models.CharField(max_length=100, blank=True)

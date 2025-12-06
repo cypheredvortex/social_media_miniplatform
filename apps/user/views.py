@@ -111,8 +111,11 @@ def logout_view(request):
     return redirect("user:login")
 
 # Admin views for user management
+# Admin views for user management
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
+from bson import ObjectId
+from django.http import Http404
 from .models import User
 from apps.enums.models import UserStatus, UserRole
 
@@ -124,68 +127,61 @@ def admin_user_list(request):
 # View user details
 def admin_user_detail(request, user_id):
     try:
-        user_id = int(user_id)
-    except (ValueError, TypeError):
-        return get_object_or_404(User, id=user_id)
-    user = get_object_or_404(User, id=user_id)
+        user = get_object_or_404(User, id=ObjectId(user_id))
+    except Exception:
+        raise Http404("No User matches the given query.")
     return render(request, 'admin/admin_user_detail.html', {'user': user})
 
+# Helper to redirect back or to default
 def _redirect_back(request):
     next_url = request.GET.get("next")
     if next_url:
         return redirect(next_url)
-
     return redirect("user:admin_user_list")  # fallback
 
 # Reactivate a suspended or banned user
 def admin_user_activate(request, user_id):
     try:
-        user_id = int(user_id)
-    except (ValueError, TypeError):
-        pass
+        user = get_object_or_404(User, id=ObjectId(user_id))
+    except Exception:
+        raise Http404("No User matches the given query.")
 
-    user = get_object_or_404(User, id=user_id)
-
-    # Set status back to ACTIVE
     user.status = UserStatus.ACTIVE
     user.save()
-
     messages.success(request, f'User {user.username} has been reactivated.')
     return _redirect_back(request)
 
 # Suspend a user
 def admin_user_suspend(request, user_id):
     try:
-        user_id = int(user_id)
-    except (ValueError, TypeError):
-        pass
-    user = get_object_or_404(User, id=user_id)
+        user = get_object_or_404(User, id=ObjectId(user_id))
+    except Exception:
+        raise Http404("No User matches the given query.")
+
     user.status = UserStatus.SUSPENDED
     user.save()
     messages.success(request, f'User {user.username} has been suspended.')
     return _redirect_back(request)
 
-
 # Ban a user
 def admin_user_ban(request, user_id):
     try:
-        user_id = int(user_id)
-    except (ValueError, TypeError):
-        pass
-    user = get_object_or_404(User, id=user_id)
+        user = get_object_or_404(User, id=ObjectId(user_id))
+    except Exception:
+        raise Http404("No User matches the given query.")
+
     user.status = UserStatus.BANNED
     user.save()
     messages.success(request, f'User {user.username} has been banned.')
     return _redirect_back(request)
 
-
 # Edit user role
 def admin_user_edit_role(request, user_id):
     try:
-        user_id = int(user_id)
-    except (ValueError, TypeError):
-        pass
-    user = get_object_or_404(User, id=user_id)
+        user = get_object_or_404(User, id=ObjectId(user_id))
+    except Exception:
+        raise Http404("No User matches the given query.")
+
     if request.method == 'POST':
         new_role = request.POST.get('role')
         if new_role in [choice[0] for choice in UserRole.choices]:
@@ -197,15 +193,13 @@ def admin_user_edit_role(request, user_id):
             messages.error(request, 'Invalid role selected.')
     return render(request, 'admin/admin_user_edit_role.html', {'user': user, 'roles': UserRole.choices})
 
-
 # View user activity (example: last login and status)
 def admin_user_activity(request, user_id):
     try:
-        user_id = int(user_id)
-    except (ValueError, TypeError):
-        pass
-    user = get_object_or_404(User, id=user_id)
-    # You can expand this to include posts, comments, reports, etc.
+        user = get_object_or_404(User, id=ObjectId(user_id))
+    except Exception:
+        raise Http404("No User matches the given query.")
+
     activity = {
         'last_login': user.last_login,
         'status': user.status,

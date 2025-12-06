@@ -26,9 +26,13 @@
                     <td class="px-6 py-4">{{ user.role }}</td>
                     <td class="px-6 py-4">
                         {% if user.status == "ACTIVE" %}
-                        <span class="px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm">Active</span>
+                            <span class="px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm">Active</span>
+                        {% elif user.status == "SUSPENDED" %}
+                            <span class="px-3 py-1 bg-yellow-100 text-yellow-700 rounded-full text-sm">Suspended</span>
+                        {% elif user.status == "BANNED" %}
+                            <span class="px-3 py-1 bg-red-100 text-red-700 rounded-full text-sm">Banned</span>
                         {% else %}
-                        <span class="px-3 py-1 bg-red-100 text-red-700 rounded-full text-sm">Suspended</span>
+                            <span class="px-3 py-1 bg-gray-200 text-gray-700 rounded-full text-sm">Unknown</span>
                         {% endif %}
                     </td>
                     <td class="px-6 py-4 flex gap-3">

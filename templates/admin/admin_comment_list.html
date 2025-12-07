@@ -26,8 +26,8 @@
                     <td class="px-6 py-4">{{ comment.text|truncatechars:50 }}</td>
                     <td class="px-6 py-4">{{ comment.author.username|default:"N/A" }}</td>
                     <td class="px-6 py-4">
-                        {% if comment.post %}
-                            {{ comment.post.text|truncatechars:50 }}
+                        {% if comment.parent_content %}
+                            {{ comment.parent_content.text|truncatechars:50 }}
                         {% else %}
                             N/A
                         {% endif %}

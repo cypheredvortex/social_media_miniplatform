@@ -1,40 +1,203 @@
-{% extends "admin/admin_panel.html" %}
+{% extends "base.html" %}
 {% load static %}
 
 {% block content %}
-<div class="bg-white p-6 rounded-2xl shadow-md max-w-3xl mx-auto">
-
-    <div class="flex justify-between items-center mb-6">
-        <h2 class="text-2xl font-bold text-gray-800">User Profile</h2>
-        {% comment %} <a href="{% url 'profil:admin_profile_edit' profile.id %}"
-           class="text-indigo-600 hover:underline font-semibold">
-            Edit Profile
-        </a> {% endcomment %}
-    </div>
-
-    <div class="flex gap-6">
-        <img src="{{ profile.avatar_url|default:'/static/img/default-avatar.png' }}" 
-             class="w-28 h-28 rounded-full border object-cover">
-
-        <div class="space-y-2">
-            <p><strong>Username:</strong> {{ profile.user.username }}</p>
-            <p><strong>Email:</strong> {{ profile.user.email }}</p>
-            <p><strong>Bio:</strong> {{ profile.bio|default:"No bio" }}</p>
-            <p><strong>Location:</strong> {{ profile.location|default:"N/A" }}</p>
-            <p><strong>Website:</strong> 
-                {% if profile.website %}
-                    <a href="{{ profile.website }}" target="_blank" class="text-blue-600 hover:underline">
-                        {{ profile.website }}
-                    </a>
-                {% else %}
-                    N/A
+<div class="max-w-4xl mx-auto px-4 py-8">
+    <!-- Profile Header -->
+    <div class="bg-white rounded-2xl shadow-md p-6 mb-6">
+        <div class="flex flex-col md:flex-row items-center md:items-start gap-6">
+            <!-- Avatar -->
+            <div class="relative">
+                <img src="{{ profile.avatar_url|default:'https://api.dicebear.com/7.x/avataaars/svg?seed=default' }}" 
+                     alt="{{ user.username }}" 
+                     class="w-32 h-32 rounded-full border-4 border-white shadow-lg">
+                {% if is_own_profile %}
+                <a href="{% url 'profil:edit' %}" 
+                   class="absolute bottom-0 right-0 bg-indigo-600 text-white p-2 rounded-full 
+                          hover:bg-indigo-700 transition shadow-md">
+                    <i class="fas fa-edit"></i>
+                </a>
                 {% endif %}
-            </p>
-            <p><strong>Birthdate:</strong> 
-                {{ profile.birthdate|date:"Y-m-d"|default:"N/A" }}
-            </p>
+            </div>
+            
+            <!-- User Info -->
+            <div class="flex-1">
+                <div class="flex flex-col md:flex-row md:items-center justify-between mb-4">
+                    <div>
+                        <h1 class="text-2xl font-bold text-gray-800">{{ user.username }}</h1>
+                        <p class="text-gray-600">{{ user.email }}</p>
+                        <p class="text-gray-600">
+                            <i class="fas fa-map-marker-alt mr-2"></i>
+                            {{ profile.location|default:"Location not set" }}
+                        </p>
+                    </div>
+                    
+                    <div class="mt-4 md:mt-0">
+                        {% if not is_own_profile %}
+                            {% if is_following %}
+                            <form method="POST" action="{% url 'follow:unfollow' user.id %}">
+                                {% csrf_token %}
+                                <button type="submit" 
+                                        class="px-6 py-2 bg-gray-200 text-gray-800 rounded-full 
+                                               hover:bg-gray-300 transition font-medium">
+                                    Following
+                                </button>
+                            </form>
+                            {% else %}
+                            <form method="POST" action="{% url 'follow:follow' user.id %}">
+                                {% csrf_token %}
+                                <button type="submit" 
+                                        class="px-6 py-2 bg-indigo-600 text-white rounded-full 
+                                               hover:bg-indigo-700 transition font-medium">
+                                    Follow
+                                </button>
+                            </form>
+                            {% endif %}
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <!-- Stats -->
+                <div class="flex gap-6 mb-4">
+                    <div class="text-center">
+                        <p class="text-2xl font-bold text-gray-800">{{ post_count }}</p>
+                        <p class="text-sm text-gray-600">Posts</p>
+                    </div>
+                    <div class="text-center">
+                        <p class="text-2xl font-bold text-gray-800">{{ followers_count }}</p>
+                        <p class="text-sm text-gray-600">Followers</p>
+                    </div>
+                    <div class="text-center">
+                        <p class="text-2xl font-bold text-gray-800">{{ following_count }}</p>
+                        <p class="text-sm text-gray-600">Following</p>
+                    </div>
+                </div>
+                
+                <!-- Bio -->
+                {% if profile.bio %}
+                <div class="mb-4">
+                    <p class="text-gray-700">{{ profile.bio }}</p>
+                </div>
+                {% endif %}
+                
+                <!-- Links -->
+                <div class="flex flex-wrap gap-4">
+                    {% if profile.website %}
+                    <a href="{{ profile.website }}" target="_blank" 
+                       class="text-indigo-600 hover:underline">
+                        <i class="fas fa-globe mr-1"></i> Website
+                    </a>
+                    {% endif %}
+                    
+                    {% if profile.birthdate %}
+                    <span class="text-gray-600">
+                        <i class="fas fa-birthday-cake mr-1"></i>
+                        Born {{ profile.birthdate|date:"F j, Y" }}
+                    </span>
+                    {% endif %}
+                </div>
+            </div>
         </div>
     </div>
-
+    
+    <!-- User's Posts -->
+    <div class="bg-white rounded-2xl shadow-md p-6">
+        <h2 class="text-xl font-bold text-gray-800 mb-6">Posts</h2>
+        
+        {% if posts %}
+        <div class="space-y-6">
+            {% for post in posts %}
+            <div class="border-b pb-6 last:border-b-0">
+                <!-- Post Header -->
+                <div class="flex items-center justify-between mb-4">
+                    <div class="flex items-center gap-3">
+                        <img src="{{ post.author.profile.avatar_url|default:'https://api.dicebear.com/7.x/avataaars/svg?seed=default' }}" 
+                             alt="{{ post.author.username }}" 
+                             class="w-10 h-10 rounded-full">
+                        <div>
+                            <h3 class="font-semibold text-gray-800">{{ post.author.username }}</h3>
+                            <p class="text-sm text-gray-500">{{ post.created_at|timesince }} ago</p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-center gap-2">
+                        <span class="px-2 py-1 text-xs rounded-full 
+                            {% if post.visibility == 'PUBLIC' %}bg-green-100 text-green-800
+                            {% elif post.visibility == 'FRIENDS_ONLY' %}bg-blue-100 text-blue-800
+                            {% else %}bg-gray-100 text-gray-800{% endif %}">
+                            {{ post.visibility }}
+                        </span>
+                    </div>
+                </div>
+                
+                <!-- Post Content -->
+                <div class="mb-4">
+                    <p class="text-gray-800">{{ post.text }}</p>
+                    
+                    {% if post.media_url %}
+                        {% if post.media_type == 'IMAGE' %}
+                        <div class="mt-4">
+                            <img src="{{ post.media_url }}" alt="Post image" 
+                                 class="max-w-full h-auto rounded-lg">
+                        </div>
+                        {% elif post.media_type == 'VIDEO' %}
+                        <div class="mt-4">
+                            <video src="{{ post.media_url }}" controls 
+                                   class="max-w-full h-auto rounded-lg"></video>
+                        </div>
+                        {% endif %}
+                    {% endif %}
+                </div>
+                
+                <!-- Post Actions -->
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-6">
+                        <button class="flex items-center gap-2 text-gray-600 hover:text-red-600">
+                            <i class="fas fa-heart"></i>
+                            <span>{{ post.likes.count }}</span>
+                        </button>
+                        
+                        <a href="{% url 'content:detail' post.id %}" 
+                           class="flex items-center gap-2 text-gray-600 hover:text-indigo-600">
+                            <i class="fas fa-comment"></i>
+                            <span>{{ post.replies.count }}</span>
+                        </a>
+                    </div>
+                    
+                    {% if is_own_profile %}
+                    <div class="flex items-center gap-2">
+                        <a href="{% url 'content:edit' post.id %}" 
+                           class="text-gray-600 hover:text-indigo-600">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                        <form method="POST" action="{% url 'content:delete' post.id %}" 
+                              class="inline">
+                            {% csrf_token %}
+                            <button type="submit" 
+                                    class="text-gray-600 hover:text-red-600"
+                                    onclick="return confirm('Delete this post?')">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </form>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center py-12">
+            <i class="fas fa-edit text-4xl text-gray-300 mb-4"></i>
+            <p class="text-gray-500">No posts yet</p>
+            {% if is_own_profile %}
+            <a href="{% url 'content:create' %}" 
+               class="mt-4 inline-block px-6 py-2 bg-indigo-600 text-white rounded-full 
+                      hover:bg-indigo-700 transition">
+                Create your first post
+            </a>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
 </div>
-{% endblock content %}
+{% endblock %}

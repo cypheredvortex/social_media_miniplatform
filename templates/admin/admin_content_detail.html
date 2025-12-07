@@ -1,0 +1,139 @@
+{% extends "admin/admin_panel.html" %}
+{% load static %}
+
+{% block content %}
+<div class="bg-white p-6 rounded-2xl shadow-md max-w-4xl mx-auto">
+    <h2 class="text-2xl font-bold text-gray-800 mb-6">Content Details</h2>
+    
+    <div class="space-y-6">
+        <!-- Author Info -->
+        <div class="flex items-center gap-4 p-4 bg-gray-50 rounded-lg">
+            <div class="w-16 h-16 rounded-full bg-indigo-100 flex items-center justify-center">
+                <span class="text-2xl font-bold text-indigo-600">
+                    {{ content.author.username|first|upper }}
+                </span>
+            </div>
+            <div>
+                <h3 class="text-xl font-semibold text-gray-800">
+                    {{ content.author.username }}
+                </h3>
+                <p class="text-gray-600">{{ content.author.email }}</p>
+                <p class="text-sm text-gray-500">
+                    Created: {{ content.created_at|date:"F j, Y, g:i a" }}
+                </p>
+            </div>
+        </div>
+
+        <!-- Content Details -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="space-y-4">
+                <div>
+                    <label class="text-sm font-medium text-gray-500">Content Type</label>
+                    <p class="mt-1 text-gray-800">{{ content.content_type }}</p>
+                </div>
+                
+                <div>
+                    <label class="text-sm font-medium text-gray-500">Media Type</label>
+                    <p class="mt-1 text-gray-800">{{ content.media_type }}</p>
+                </div>
+                
+                <div>
+                    <label class="text-sm font-medium text-gray-500">Visibility</label>
+                    <p class="mt-1 text-gray-800">{{ content.visibility }}</p>
+                </div>
+                
+                <div>
+                    <label class="text-sm font-medium text-gray-500">Status</label>
+                    <span class="mt-1 inline-block px-3 py-1 rounded-full text-sm font-medium 
+                        {% if content.status == 'ACTIVE' %}bg-green-100 text-green-800
+                        {% elif content.status == 'DELETED' %}bg-red-100 text-red-800
+                        {% elif content.status == 'FLAGGED' %}bg-yellow-100 text-yellow-800
+                        {% else %}bg-gray-100 text-gray-800{% endif %}">
+                        {{ content.status }}
+                    </span>
+                </div>
+            </div>
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="text-sm font-medium text-gray-500">Edited</label>
+                    <p class="mt-1 text-gray-800">
+                        {% if content.is_edited %}Yes{% else %}No{% endif %}
+                    </p>
+                </div>
+                
+                <div>
+                    <label class="text-sm font-medium text-gray-500">Last Updated</label>
+                    <p class="mt-1 text-gray-800">{{ content.updated_at|date:"F j, Y, g:i a" }}</p>
+                </div>
+                
+                {% if content.parent_content %}
+                <div>
+                    <label class="text-sm font-medium text-gray-500">Parent Content</label>
+                    <p class="mt-1">
+                        <a href="{% url 'content:admin_content_detail' content.parent_content.id|stringformat:'s' %}" 
+                           class="text-indigo-600 hover:underline">
+                            View Parent ({{ content.parent_content.content_type }})
+                        </a>
+                    </p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Content Text -->
+        <div>
+            <label class="text-sm font-medium text-gray-500">Content</label>
+            <div class="mt-2 p-4 bg-gray-50 rounded-lg">
+                <p class="text-gray-800 whitespace-pre-wrap">{{ content.text }}</p>
+            </div>
+        </div>
+
+        <!-- Media Preview -->
+        {% if content.media_url %}
+        <div>
+            <label class="text-sm font-medium text-gray-500">Media</label>
+            <div class="mt-2">
+                {% if content.media_type == 'IMAGE' %}
+                    <img src="{{ content.media_url }}" alt="Content image" 
+                         class="max-w-full h-auto rounded-lg shadow-md">
+                {% elif content.media_type == 'VIDEO' %}
+                    <video src="{{ content.media_url }}" controls 
+                           class="max-w-full h-auto rounded-lg shadow-md"></video>
+                {% else %}
+                    <a href="{{ content.media_url }}" target="_blank" 
+                       class="text-indigo-600 hover:underline break-all">
+                        {{ content.media_url }}
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Actions -->
+        <div class="flex flex-wrap gap-4 pt-6 border-t">
+            <a href="{% url 'content:admin_content_list' %}" 
+               class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 
+                      transition font-medium">
+                ← Back to List
+            </a>
+            
+            {% if content.status != 'DELETED' %}
+            <a href="{% url 'content:admin_content_delete' content.id|stringformat:'s' %}" 
+               class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 
+                      transition font-medium">
+                Delete Content
+            </a>
+            {% endif %}
+            
+            {% if content.status != 'FLAGGED' %}
+            <a href="{% url 'content:admin_content_mark_flagged' content.id|stringformat:'s' %}" 
+               class="px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 
+                      transition font-medium">
+                Flag Content
+            </a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

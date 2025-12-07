@@ -1,7 +1,6 @@
-from django.db import models
+from djongo import models
 
 # Create your models here.
-from djongo import models
 from apps.user.models import User
 from apps.content.models import Content
 from apps.enums.models import ReportStatus, ReportTargetType

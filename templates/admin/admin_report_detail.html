@@ -1,0 +1,122 @@
+{% extends "admin/admin_panel.html" %}
+{% load static %}
+
+{% block content %}
+<div class="bg-white p-6 rounded-2xl shadow-md max-w-4xl mx-auto">
+    <h2 class="text-2xl font-bold text-gray-800 mb-6">Report Details</h2>
+    
+    <div class="space-y-6">
+        <!-- Report Info -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-500">Reporter</label>
+                    <p class="mt-1 text-gray-800">
+                        <a href="{% url 'user:admin_user_detail' report.reporter.id %}" 
+                           class="text-indigo-600 hover:underline">
+                            {{ report.reporter.username }}
+                        </a>
+                    </p>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-500">Report Type</label>
+                    <p class="mt-1 text-gray-800">{{ report.target_type }}</p>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-500">Status</label>
+                    <span class="mt-1 inline-block px-3 py-1 rounded-full text-sm font-medium 
+                        {% if report.status == 'PENDING' %}bg-yellow-100 text-yellow-800
+                        {% elif report.status == 'RESOLVED' %}bg-green-100 text-green-800
+                        {% else %}bg-red-100 text-red-800{% endif %}">
+                        {{ report.status }}
+                    </span>
+                </div>
+            </div>
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-500">Created At</label>
+                    <p class="mt-1 text-gray-800">{{ report.created_at|date:"F j, Y, g:i a" }}</p>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-500">Target</label>
+                    <p class="mt-1">
+                        {% if report.target_type == 'USER' and report.target_user %}
+                            <a href="{% url 'user:admin_user_detail' report.target_user.id %}" 
+                               class="text-indigo-600 hover:underline">
+                                {{ report.target_user.username }}
+                            </a>
+                        {% elif report.target_type == 'CONTENT' and report.target_content %}
+                            <a href="{% url 'content:admin_content_detail' report.target_content.id %}" 
+                               class="text-indigo-600 hover:underline">
+                                View Content
+                            </a>
+                        {% else %}
+                            <span class="text-gray-500">N/A</span>
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Reason -->
+        <div>
+            <label class="block text-sm font-medium text-gray-500 mb-2">Reason</label>
+            <div class="p-4 bg-gray-50 rounded-lg">
+                <p class="text-gray-800 whitespace-pre-wrap">{{ report.reason }}</p>
+            </div>
+        </div>
+        
+        <!-- Target Details -->
+        {% if report.target_type == 'CONTENT' and report.target_content %}
+        <div>
+            <label class="block text-sm font-medium text-gray-500 mb-2">Reported Content</label>
+            <div class="p-4 border border-gray-200 rounded-lg">
+                <div class="flex items-center gap-3 mb-3">
+                    <div class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center">
+                        <span class="text-sm font-medium">
+                            {{ report.target_content.author.username|first|upper }}
+                        </span>
+                    </div>
+                    <div>
+                        <p class="font-medium text-gray-800">{{ report.target_content.author.username }}</p>
+                        <p class="text-sm text-gray-500">{{ report.target_content.created_at|timesince }} ago</p>
+                    </div>
+                </div>
+                <p class="text-gray-800">{{ report.target_content.text|truncatechars:200 }}</p>
+            </div>
+        </div>
+        {% endif %}
+        
+        <!-- Actions -->
+        <div class="flex gap-4 pt-6 border-t">
+            <a href="{% url 'report:admin_report_list' %}" 
+               class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition font-medium">
+                ← Back to Reports
+            </a>
+            
+            {% if report.status == 'PENDING' %}
+            <a href="{% url 'report:admin_report_resolve' report.id %}" 
+               class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition font-medium">
+                Resolve Report
+            </a>
+            
+            <a href="{% url 'report:admin_report_reject' report.id %}" 
+               class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition font-medium">
+                Reject Report
+            </a>
+            
+            {% if report.target_user %}
+            <a href="{% url 'report:admin_send_warning' report.target_user.id %}" 
+               class="px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition font-medium">
+                Send Warning
+            </a>
+            {% endif %}
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

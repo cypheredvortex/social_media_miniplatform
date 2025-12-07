@@ -1,9 +1,10 @@
 from django.urls import path
+from . import views
 
-# Notification app URL configuration
-# Keep this file present and export `urlpatterns` so it can be included by the project.
+app_name = "notification"
+
 urlpatterns = [
-	# Example placeholder route (add real routes as needed):
-	# path('', views.notification_list, name='notification_list'),
+    path('', views.notification_list, name='list'),
+    path('<str:notification_id>/read/', views.mark_as_read, name='mark_read'),
+    path('mark-all-read/', views.mark_all_read, name='mark_all_read'),
 ]
-

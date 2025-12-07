@@ -1,32 +1,19 @@
-"""
-URL configuration for social_media_miniplatform project.
-
-The `urlpatterns` list routes URLs to views. For more information please see:
-    https://docs.djangoproject.com/en/5.2/topics/http/urls/
-Examples:
-Function views
-    1. Add an import:  from my_app import views
-    2. Add a URL to urlpatterns:  path('', views.home, name='home')
-Class-based views
-    1. Add an import:  from other_app.views import Home
-    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
-Including another URLconf
-    1. Import the include() function: from django.urls import include, path
-    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
-"""
 from django.contrib import admin
-from django.urls import path
-from django.urls import include
+from django.urls import path, include
+from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
     path('', include('apps.pages.urls')),
     path('admin/', admin.site.urls),
     path('user/', include('apps.user.urls')),
     path('content/', include('apps.content.urls')),
-    path('post/', include('apps.post.urls')),
-    path('comment/', include('apps.comment.urls')),
     path('like/', include('apps.like.urls')),
     path('profile/', include('apps.profil.urls')),
     path('report/', include('apps.report.urls')),
     path('notification/', include('apps.notification.urls')),
+    path('follow/', include('apps.follow.urls')),
 ]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

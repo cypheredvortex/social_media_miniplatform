@@ -1,11 +1,10 @@
-from django.db import models
+from djongo import models
 
 # Create your models here.
-from djongo import models
 from apps.user.models import User
 
 class Profile(models.Model):
-    id = models.ObjectIdField(primary_key=True)  # <-- Change from IntegerField
+    id = models.ObjectIdField(primary_key=True)
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     bio = models.TextField(blank=True)
     location = models.CharField(max_length=100, blank=True)

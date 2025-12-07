@@ -1,20 +1,22 @@
+<!-- admin_content_list.html -->
 {% extends "admin/admin_panel.html" %}
 {% load static %}
 
 {% block content %}
 <div class="bg-white p-6 rounded-2xl shadow-md">
 
-    <h2 class="text-2xl font-bold text-gray-800 mb-4">Reported Content</h2>
+    <h2 class="text-2xl font-bold text-gray-800 mb-4">All Content</h2>
 
     <div class="overflow-x-auto">
         <table class="min-w-full divide-y divide-gray-200">
-
             <thead>
                 <tr class="text-gray-600 text-left text-xs uppercase">
-                    <th class="px-6 py-3">Content</th>
-                    <th class="px-6 py-3">Created At</th>
-                    <th class="px-6 py-3">Edited</th>
+                    <th class="px-6 py-3">Type</th>
+                    <th class="px-6 py-3">Author</th>
+                    <th class="px-6 py-3">Text / Media</th>
+                    <th class="px-6 py-3">Visibility</th>
                     <th class="px-6 py-3">Status</th>
+                    <th class="px-6 py-3">Created At</th>
                     <th class="px-6 py-3">Actions</th>
                 </tr>
             </thead>
@@ -22,22 +24,59 @@
             <tbody class="divide-y divide-gray-200">
                 {% for content in contents %}
                 <tr class="hover:bg-gray-50">
-                    <td class="px-6 py-4">{{ content.text|truncatechars:60 }}</td>
-                    <td class="px-6 py-4">{{ content.created_at|date:"Y-m-d H:i" }}</td>
-                    <td class="px-6 py-4">{% if content.is_edited %}Yes{% else %}No{% endif %}</td>
+                    <!-- Content Type -->
+                    <td class="px-6 py-4">{{ content.content_type }}</td>
+
+                    <!-- Author - WITH DEBUGGING -->
+                    <td class="px-6 py-4">
+                        {% if content.author %}
+                            {{ content.author.username }}
+                        {% else %}
+                            <span class="text-red-500 font-medium">
+                                No Author
+                                {% if content.author_id %}
+                                    (ID: {{ content.author_id }})
+                                {% endif %}
+                            </span>
+                        {% endif %}
+                    </td>
+
+                    <!-- Text / Media Preview -->
+                    <td class="px-6 py-4">
+                        {% if content.media_type == 'TEXT' %}
+                            {{ content.text|truncatechars:50 }}
+                        {% elif content.media_type == 'IMAGE' %}
+                            <img src="{{ content.media_url }}" alt="Image Content" class="w-20 h-20 object-cover rounded">
+                        {% elif content.media_type == 'VIDEO' %}
+                            <video src="{{ content.media_url }}" class="w-32 h-20 rounded" controls></video>
+                        {% else %}
+                            N/A
+                        {% endif %}
+                    </td>
+
+                    <!-- Visibility -->
+                    <td class="px-6 py-4">{{ content.visibility }}</td>
+
+                    <!-- Status -->
                     <td class="px-6 py-4">{{ content.status }}</td>
+
+                    <!-- Created At -->
+                    <td class="px-6 py-4">{{ content.created_at|date:"Y-m-d H:i" }}</td>
+
+                    <!-- Actions -->
+                    <!-- Change this line -->
                     <td class="px-6 py-4 flex gap-3">
-                        <a href="{% url 'content:admin_content_approve' content.id|stringformat:"s" %}" class="text-green-600 hover:underline">Approve</a>
-                        <a href="{% url 'content:admin_content_reject' content.id|stringformat:"s" %}" class="text-red-600 hover:underline">Reject</a>
+                        <a href="{% url 'content:admin_content_detail' content.id %}" class="text-indigo-600 hover:underline">View</a>
+                        <a href="{% url 'content:admin_content_delete' content.id %}" class="text-red-600 hover:underline">Delete</a>
+                        <a href="{% url 'content:admin_content_mark_flagged' content.id %}" class="text-yellow-600 hover:underline">Flag</a>
                     </td>
                 </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="5" class="px-6 py-4 text-center text-gray-500">No reported content.</td>
+                    <td colspan="7" class="px-6 py-4 text-center text-gray-500">No content found.</td>
                 </tr>
                 {% endfor %}
             </tbody>
-
         </table>
     </div>
 </div>

@@ -43,8 +43,9 @@
                             N/A
                         {% endif %}
                     </td>
-                    <td class="px-6 py-4 flex gap-3">
-                        <a href="{% url 'profil:admin_profile_detail' profile.id|stringformat:"s" %}" class="text-indigo-600 hover:underline">View</a>
+                    <!-- Change this line -->
+                     <td class="px-6 py-4 flex gap-3">
+                        <a href="{% url 'profil:admin_profile_detail' profile.id %}" class="text-indigo-600 hover:underline">View</a>
                     </td>
                 </tr>
                 {% empty %}

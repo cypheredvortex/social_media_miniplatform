@@ -1,7 +1,6 @@
 from django.db import models
 
 # Create your models here.
-from djongo import models
 
 class VisibilityType(models.TextChoices):
     PUBLIC = "PUBLIC"
@@ -35,6 +34,5 @@ class ReportStatus(models.TextChoices):
     REJECTED = "REJECTED"
 
 class ReportTargetType(models.TextChoices):
-    POST = "POST"
-    COMMENT = "COMMENT"
+    CONTENT = "CONTENT"
     USER = "USER"

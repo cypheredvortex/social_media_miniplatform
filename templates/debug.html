@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Debug Info</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .info { background: #f0f0f0; padding: 15px; margin: 10px 0; border-radius: 5px; }
+        .debug-item { background: #e8f4f8; padding: 10px; margin: 5px 0; border-left: 4px solid #2196F3; }
+    </style>
+</head>
+<body>
+    <h1>Debug Information</h1>
+    
+    <div class="info">
+        <h2>Counts:</h2>
+        <p>Users: {{ user_count }}</p>
+        <p>Content Items: {{ content_count }}</p>
+    </div>
+    
+    <div class="info">
+        <h2>Content Items:</h2>
+        {% for item in debug_info %}
+        <div class="debug-item">
+            <p><strong>ID:</strong> {{ item.id }}</p>
+            <p><strong>Type:</strong> {{ item.content_type }}</p>
+            <p><strong>Author ID:</strong> {{ item.author_id }}</p>
+            <p><strong>Author Exists:</strong> {{ item.author_exists }}</p>
+            <p><strong>Username:</strong> {{ item.author_username }}</p>
+            <p><strong>Text Preview:</strong> {{ item.text }}</p>
+        </div>
+        {% empty %}
+        <p>No content found.</p>
+        {% endfor %}
+    </div>
+    
+    <a href="/content/admin/">Go to Content Admin</a>
+</body>
+</html>
